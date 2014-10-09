@@ -9,13 +9,15 @@ requirejs.config({
 		src: 'src',
 		lib: 'lib',
 		components: 'components-build',
+		stores: 'stores',
 
 		// library directories
 		logviking: 'lib/logviking',
 
 		// specific components
 		jquery: 'lib/jquery/jquery-2.1.1.min',
-		React: 'lib/react/react-with-addons'
+		React: 'lib/react/react-with-addons',
+		EventEmitter: 'lib/eventemitter/EventEmitter'
 	},
 
 	// configuration of exports and dependencies

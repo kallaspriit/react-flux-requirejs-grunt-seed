@@ -1,21 +1,27 @@
 /** @jsx React.DOM */
 define([
 	'React',
-	'logviking/Logger'
-], function(React, logger) {
+	'logviking/Logger',
+	'components/AppTodoList',
+	'components/AppTodoForm',
+	'components/AppTodoStats'
+], function(React, logger, AppTodoList, AppTodoForm, AppTodoStats) {
 	'use strict';
 	
 	var log = logger.get('AppRootComponent');
 
-	var AppRoot = React.createClass({
+	return React.createClass({
 		render: function () {
 			log.info('render');
 		
 			return (
-				<h1>React Flux RequireJS Grunt - the seed project</h1>
+				<div>
+					<h1>React Flux RequireJS Grunt - example todo list seed project</h1>
+					<AppTodoList/>
+					<AppTodoStats/>
+					<AppTodoForm/>
+				</div>
 			);
 		}
 	});
-	
-	return AppRoot;
 });
