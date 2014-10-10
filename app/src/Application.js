@@ -1,5 +1,5 @@
 define([
-	'logviking/Logger',
+	'logger',
 	'logviking/ConsoleLog',
 	'logviking/SocketLog',
 	'stores',

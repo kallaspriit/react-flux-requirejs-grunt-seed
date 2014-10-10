@@ -1,6 +1,6 @@
 define([
 	'jquery',
-	'logviking/Logger'
+	'logger'
 ], function($, logger) {
 	'use strict';
 	

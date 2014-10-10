@@ -1,6 +1,6 @@
 define([
 	'EventEmitter',
-	'logviking/Logger'
+	'logger'
 ], function(EventEmitter, logger) {
 	'use strict';
 	

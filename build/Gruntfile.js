@@ -71,20 +71,26 @@ module.exports = function (grunt) {
 			combined: {
 				options: {
 					baseUrl: '../dist',
+					// TODO extract this from app.js?
 					paths: {
 						// main directories
 						src: 'src',
 						lib: 'lib',
+						config: 'config',
 						components: 'components-build',
-						stores: 'stores',
 
 						// library directories
 						logviking: 'lib/logviking',
+						reactor: 'lib/reactor',
 
 						// specific components
 						jquery: 'lib/jquery/jquery-2.1.1.min',
 						React: 'lib/react/react-with-addons',
-						EventEmitter: 'lib/eventemitter/EventEmitter'
+						EventEmitter: 'lib/eventemitter/EventEmitter',
+
+						// shortcuts
+						logger: 'lib/logviking/Logger',
+						intent: 'lib/reactor/Intent'
 					},
 					name: 'src/Application',
 					out: '../dist/app.build.js',
@@ -169,7 +175,7 @@ module.exports = function (grunt) {
 		'string-replace:distScript',
 		'clean:postDist'
 	]);
-	grunt.registerTask('watch', ['watch:jsx']);
+	grunt.registerTask('jsx', ['watch:jsx']);
 	grunt.registerTask('server-dev', ['connect:dev']);
 	grunt.registerTask('server-production', ['build', 'connect:production']);
 	grunt.registerTask('default', ['build', 'server-dev']);

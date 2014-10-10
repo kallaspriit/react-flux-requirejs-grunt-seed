@@ -1,8 +1,8 @@
 /** @jsx React.DOM */
 define([
 	'React',
-	'logviking/Logger',
-	'src/Intent'
+	'logger',
+	'intent'
 ], function(React, logger, intent) {
 	'use strict';
 	

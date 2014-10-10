@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 define([
 	'React',
-	'logviking/Logger',
+	'logger',
 	'components/TodoListComponent',
 	'components/TodoFormComponent',
 	'components/TodoStatsComponent'

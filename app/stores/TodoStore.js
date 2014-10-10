@@ -1,6 +1,6 @@
 define([
-	'logviking/Logger',
-	'src/Intent',
+	'logger',
+	'intent',
 	'models/TodoItemModel'
 ], function(logger, intent, TodoItemModel) {
 	'use strict';
