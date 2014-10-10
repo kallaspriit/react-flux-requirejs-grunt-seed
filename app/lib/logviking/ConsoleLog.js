@@ -2,9 +2,41 @@ define([
 ], function() {
 	'use strict';
 
-	var ConsoleLog = function() {
-		this._activeComponent = null;
-		this._groupTimeout = null;
+	var ConsoleLog = function(config) {
+		var key;
+
+		config = config || {};
+
+		this._config = {
+			padComponent: true,
+			componentNameWidth: 20,
+			timeWidth: 8,
+			trackTime: true,
+			useColors: null,
+			colors: [
+				'lightseagreen',
+				'forestgreen',
+				'goldenrod',
+				'dodgerblue',
+				'darkorchid',
+				'crimson',
+				'darkred',
+				'darkslategray'
+			]
+		};
+		this._colorIndex = 0;
+		this._componentToColorIndexMap = {};
+		this._componentLastLogTime = {};
+
+		if (typeof config === 'object' && config !== null) {
+			for (key in config) {
+				this._config[key] = config[key];
+			}
+		}
+
+		if (this._config.useColors === null) {
+			this._config.useColors = this._getDefaultUseColors();
+		}
 	};
 
 	ConsoleLog.prototype.log = function() {
@@ -24,30 +56,96 @@ define([
 	};
 
 	ConsoleLog.prototype._log = function(type, component) {
-		if (component !== this._activeComponent) {
-			if (this._activeComponent !== null) {
-				console.groupEnd();
+		var parameters = Array.prototype.slice.call(arguments, 0),
+			deltaTime = null,
+			renderTime,
+			currentTime,
+			timeUnit,
+			type,
+			component,
+			paddedComponent,
+			color,
+			data;
+
+		if (parameters.length < 3) {
+			console[type].apply(console, parameters);
+		}
+
+		type = parameters.shift();
+		component = parameters.shift();
+
+		paddedComponent = component;
+
+		if (this._config.padComponent) {
+			if (component.length + 1 > this._config.componentNameWidth) {
+				this._config.componentNameWidth = component.length + 1;
 			}
 
-			console.group(component);
-
-			this._activeComponent = component;
+			if (paddedComponent.length < this._config.componentNameWidth) {
+				paddedComponent = this._pad(paddedComponent, this._config.componentNameWidth);
+			}
 		}
 
-		console[type].apply(console, Array.prototype.slice.call(arguments, 0).slice(1));
+		if (this._config.useColors) {
+			if (typeof this._componentToColorIndexMap[component] === 'undefined') {
+				this._componentToColorIndexMap[component] = this._colorIndex;
 
-		if (this._groupTimeout !== null) {
-			window.clearTimeout(this._groupTimeout);
+				this._colorIndex = (this._colorIndex + 1) % this._config.colors.length;
+			}
 
-			this._groupTimeout = null;
+			color = this._config.colors[this._componentToColorIndexMap[component]];
+			data = ['%c' + paddedComponent, 'color: ' + color + ';'].concat(parameters);
+		} else {
+			data = [paddedComponent].concat(parameters);
 		}
 
-		this._groupTimeout = window.setTimeout(function() {
-			console.groupEnd();
+		if (this._config.trackTime) {
+			currentTime = (new Date()).getTime();
 
-			this._activeComponent = null;
-			this._groupTimeout = null;
-		}.bind(this), 500);
+			if (typeof this._componentLastLogTime[component] !== 'undefined') {
+				deltaTime = currentTime - this._componentLastLogTime[component];
+			}
+
+			this._componentLastLogTime[component] = currentTime;
+
+			if (deltaTime !== null) {
+				renderTime = deltaTime;
+				timeUnit = 'ms';
+
+				if (deltaTime > 60000) {
+					renderTime = (deltaTime / 60000).toPrecision(2);
+					timeUnit = 'm';
+				} else if (deltaTime > 2000) {
+					renderTime = (deltaTime / 1000).toPrecision(3);
+					timeUnit = 's';
+				}
+
+				data[0] = this._pad(renderTime.toString() + timeUnit, this._config.timeWidth) + data[0];
+			} else {
+				data[0] = this._pad('', this._config.timeWidth) + data[0];
+			}
+		}
+
+		console[type].apply(console, data);
+	};
+
+	ConsoleLog.prototype._pad = function(str, width) {
+		var padSize = width - str.length + 1;
+
+		if (padSize < 1) {
+			return str;
+		}
+
+		return (Array(padSize).join(' ')) + str;
+	};
+
+	ConsoleLog.prototype._getDefaultUseColors = function useColors() {
+		// is webkit? http://stackoverflow.com/a/16459606/376773
+		return ('WebkitAppearance' in document.documentElement.style) ||
+			// is firebug? http://stackoverflow.com/a/398120/376773
+			(window.console && (console.firebug || (console.exception && console.table))) ||
+			// is firefox >= v31? https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+			(navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
 	};
 
 	return ConsoleLog;

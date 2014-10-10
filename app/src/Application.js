@@ -4,8 +4,8 @@ define([
 	'logviking/SocketLog',
 	'stores',
 	'React',
-	'components/AppRoot'
-], function(logger, ConsoleLog, SocketLog, stores, React, AppRoot) {
+	'components/RootComponent'
+], function(logger, ConsoleLog, SocketLog, stores, React, RootComponent) {
 	'use strict';
 	
 	var log = logger.get('Application');
@@ -20,7 +20,7 @@ define([
 		log.info('bootstrap');
 
 		this._setupStores();
-		this._setupAppRoot();
+		this._setupRootComponent();
 		this._setupDummyData();
 	};
 
@@ -33,16 +33,15 @@ define([
 		this.stores = stores;
 	};
 
-
 	Application.prototype._setupDummyData = function() {
 		this.stores.todo.addTodoItem({ text: 'first item ', isDone: true });
 		this.stores.todo.addTodoItem({ text: 'second item ' });
 		this.stores.todo.addTodoItem({ text: 'third item ' });
 	};
 
-	Application.prototype._setupAppRoot = function() {
+	Application.prototype._setupRootComponent = function() {
 		React.renderComponent(
-			new AppRoot(null),
+			new RootComponent(null),
 			document.getElementById('application-wrap')
 		);
 	};

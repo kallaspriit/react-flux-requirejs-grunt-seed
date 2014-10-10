@@ -7,7 +7,7 @@ define([
 ], function(React, logger, intent, stores) {
 	'use strict';
 	
-	var log = logger.get('AppTodoStatsComponent');
+	var log = logger.get('TodoStatsComponent');
 
 	return React.createClass({
 

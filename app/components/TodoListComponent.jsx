@@ -7,9 +7,9 @@ define([
 ], function(React, logger, intent, stores) {
 	'use strict';
 	
-	var log = logger.get('AppTodoListComponent');
+	var log = logger.get('TodoListComponent');
 
-	var AppTodoList = React.createClass({displayName: 'AppTodoList',
+	return React.createClass({
 
 		getInitialState: function() {
 			return {
@@ -45,20 +45,18 @@ define([
 				};
 
 				return (
-					React.DOM.div({key: index}, 
-						React.DOM.input({type: "checkbox", value: "1", checked: item.isDone, onChange: toggleTodoItem}), item.text, " ", React.DOM.a({href: "#", onClick: removeTodoItem}, "[x]")
-					)
+					<div key={index}>
+						<input type="checkbox" value="1" checked={item.isDone} onChange={toggleTodoItem}/>{item.text} <a href="#" onClick={removeTodoItem}>[x]</a>
+					</div>
 				);
 			});
 		
 			return (
-				React.DOM.div(null, 
-					React.DOM.h2(null, "Items"), 
-					itemList
-				)
+				<div>
+					<h2>Items</h2>
+					{itemList}
+				</div>
 			);
 		}
 	});
-	
-	return AppTodoList;
 });

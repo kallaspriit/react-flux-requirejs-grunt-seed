@@ -23,7 +23,7 @@ define([
 		intent.emits(TodoStore.Action.TODO_LIST_CHANGED);
 	};
 
-	// all stores have their own prefix
+	// all stores have their own prefix TODO_ etc
 	TodoStore.Action = {
 		TODO_ADD_ITEM: 'TODO_ADD_ITEM',
 		TODO_REMOVE_ITEM: 'TODO_REMOVE_ITEM',
@@ -46,7 +46,6 @@ define([
 
 		intent.emit(TodoStore.Action.TODO_LIST_CHANGED);
 	};
-
 
 	TodoStore.prototype.toggleTodoItem = function(info) {
 		log.info('toggle item: ' + info.index);
