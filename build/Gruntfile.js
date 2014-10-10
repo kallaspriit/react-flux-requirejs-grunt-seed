@@ -43,6 +43,7 @@ module.exports = function (grunt) {
 					'../dist/stores',
 					'../dist/app.js',
 					'../dist/stores.js',
+					'../dist/routes.js',
 					'../dist/.jshint*'
 				],
 				options: {
@@ -87,10 +88,19 @@ module.exports = function (grunt) {
 						jquery: 'lib/jquery/jquery-2.1.1.min',
 						React: 'lib/react/react-with-addons',
 						EventEmitter: 'lib/eventemitter/EventEmitter',
+						Director: 'lib/director/director',
 
 						// shortcuts
 						logger: 'lib/logviking/Logger',
 						intent: 'lib/reactor/Intent'
+					},
+					shim: {
+						jquery: {
+							exports: '$'
+						},
+						Director: {
+							exports: 'Router'
+						}
 					},
 					name: 'src/Application',
 					out: '../dist/app.build.js',

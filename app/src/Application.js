@@ -3,15 +3,17 @@ define([
 	'logviking/ConsoleLog',
 	'logviking/SocketLog',
 	'stores',
+	'routes',
 	'React',
+	'reactor/Router',
 	'components/RootComponent'
-], function(logger, ConsoleLog, SocketLog, stores, React, RootComponent) {
+], function(logger, ConsoleLog, SocketLog, stores, routes, React, router, RootComponent) {
 	'use strict';
 	
 	var log = logger.get('Application');
 
 	var Application = function() {
-		this.stores = {};
+		this._router = null;
 	};
 	
 	Application.prototype.bootstrap = function() {
@@ -19,9 +21,9 @@ define([
 
 		log.info('bootstrap');
 
-		this._setupStores();
-		this._setupRootComponent();
 		this._setupDummyData();
+		this._setupRouter();
+		this._setupRootComponent();
 	};
 
 	Application.prototype._setupLogger = function() {
@@ -29,14 +31,15 @@ define([
 		logger.addReporter(new SocketLog('localhost', 2222));
 	};
 
-	Application.prototype._setupStores = function() {
-		this.stores = stores;
+	Application.prototype._setupDummyData = function() {
+		stores.todo.addTodoItem({ text: 'first item ', isDone: true });
+		stores.todo.addTodoItem({ text: 'second item ' });
+		stores.todo.addTodoItem({ text: 'third item ' });
 	};
 
-	Application.prototype._setupDummyData = function() {
-		this.stores.todo.addTodoItem({ text: 'first item ', isDone: true });
-		this.stores.todo.addTodoItem({ text: 'second item ' });
-		this.stores.todo.addTodoItem({ text: 'third item ' });
+	Application.prototype._setupRouter = function() {
+		this._router = router;
+		this._router.init(routes, this._handleRouteMatch.bind(this));
 	};
 
 	Application.prototype._setupRootComponent = function() {
@@ -44,6 +47,10 @@ define([
 			new RootComponent(null),
 			document.getElementById('application-wrap')
 		);
+	};
+
+	Application.prototype._handleRouteMatch = function(routeName, routeInfo, parameters) {
+		log.info('handle route match', routeName, routeInfo, parameters);
 	};
 
     return Application;

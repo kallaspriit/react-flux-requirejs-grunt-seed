@@ -1,0 +1,27 @@
+# Force Internet Explorer to render pages in the highest available
+# mode in the various cases when it may not.
+# https://hsivonen.fi/doctype/#ie8
+
+<IfModule mod_headers.c>
+    Header set X-UA-Compatible "IE=edge"
+    # `mod_headers` cannot match based on the content-type, however, this header
+    # should be send only for HTML documents and not for the other resources
+    <FilesMatch "\.(appcache|atom|crx|css|cur|eot|f4[abpv]|flv|gif|htc|ico|jpe?g|js|json(ld)?|m4[av]|manifest|map|mp4|oex|og[agv]|opus|otf|pdf|png|rdf|rss|safariextz|svgz?|swf|tt[cf]|txt|vcf|vtt|webapp|web[mp]|woff|xml|xpi)$">
+        Header unset X-UA-Compatible
+    </FilesMatch>
+</IfModule>
+
+AddOutputFilterByType DEFLATE text/plain
+AddOutputFilterByType DEFLATE text/html
+AddOutputFilterByType DEFLATE text/xml
+AddOutputFilterByType DEFLATE text/css
+AddOutputFilterByType DEFLATE application/xml
+AddOutputFilterByType DEFLATE application/xhtml+xml
+AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/javascript
+AddOutputFilterByType DEFLATE application/x-javascript
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^.+(?<!js|JS|html|HTML)$ index.html [QSA,L]

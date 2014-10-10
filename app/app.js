@@ -19,6 +19,7 @@ requirejs.config({
 		jquery: 'lib/jquery/jquery-2.1.1.min',
 		React: 'lib/react/react-with-addons',
 		EventEmitter: 'lib/eventemitter/EventEmitter',
+		Director: 'lib/director/director',
 
 		// shortcuts
 		logger: 'lib/logviking/Logger',
@@ -29,6 +30,9 @@ requirejs.config({
 	shim: {
 		jquery: {
 			exports: '$'
+		},
+		Director: {
+			exports: 'Router'
 		}
 	}
 });
