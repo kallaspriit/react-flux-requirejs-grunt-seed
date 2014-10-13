@@ -14,6 +14,7 @@ define([
 		
 			return (
 				<ul>
+					<li><Link route="users">Users</Link></li>
 					<li><Link href="/users/10">User 10</Link></li>
 					<li><Link route="todo">ToDo route</Link></li>
 					<li><Link route="user" id="5">User 5 route</Link></li>

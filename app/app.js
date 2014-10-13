@@ -18,12 +18,14 @@ requirejs.config({
 		React: 'lib/react/react-with-addons',
 		EventEmitter: 'lib/eventemitter/EventEmitter',
 		Director: 'lib/director/director',
+		AbstractActivity: 'lib/reactor/AbstractActivity',
 
 		// shortcuts to singletons
 		logger: 'lib/logviking/Logger',
 		intent: 'lib/reactor/Intent',
 		router: 'lib/reactor/Router',
 		navi: 'lib/reactor/Navi',
+		dispatcher: 'lib/reactor/Dispatcher',
 		config: 'config/config',
 		environment: 'config/environment'
 	},
@@ -41,6 +43,8 @@ requirejs.config({
 
 // bootstrap the application
 requirejs(['src/Application'], function(Application) {
+	'use strict';
+
 	// register the app under window for easy inspection and debugging
 	var app = window.app = new Application();
 

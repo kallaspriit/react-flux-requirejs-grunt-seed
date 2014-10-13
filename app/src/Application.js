@@ -1,27 +1,27 @@
 define([
-	'React',
 	'logviking/ConsoleLog',
 	'logviking/SocketLog',
-	'stores',
 	'config',
+	'stores',
 	'routes',
+	'activities',
 	'logger',
-	'router',
 	'navi',
-	'intent',
-	'components/RootComponent'
+	'router',
+	'dispatcher',
+	'intent'
 ], function(
-	React,
 	ConsoleLog,
 	SocketLog,
-	stores,
 	config,
+	stores,
 	routes,
+	activities,
 	logger,
-	router,
 	navi,
-	intent,
-	RootComponent
+	router,
+	dispatcher,
+	intent
 ) {
 	'use strict';
 	
@@ -33,11 +33,31 @@ define([
 	 * @constructor
 	 */
 	var Application = function() {
-		/* @type Router */
-		this.router = router;
+		// the main components are registered below for debugging on the console, don't rely on them in your app
+
+		/* @type Object */
+		this.config = config;
+
+		/* @type Array */
+		this.stores = stores;
+
+		/* @type Object */
+		this.routes = routes;
+
+		/* @type Object */
+		this.activities = activities;
+
+		/* @type Logger */
+		this.logger = logger;
 
 		/* @type Navi */
 		this.navi = navi;
+
+		/* @type Router */
+		this.router = router;
+
+		/* @type Dispatcher */
+		this.dispatcher = dispatcher;
 
 		/* @type Intent */
 		this.intent = intent;
@@ -51,8 +71,8 @@ define([
 
 		this._setupLogger();
 		this._setupDummyData();
+		this._setupDispatcher();
 		this._setupRouter();
-		this._setupRootComponent();
 	};
 
 	/**
@@ -62,11 +82,15 @@ define([
 	 */
 	Application.prototype._setupLogger = function() {
 		if (config.debug) {
+			log.info('setup logger in debug mode');
+
 			logger.addReporters(
 				new ConsoleLog(),
 				new SocketLog('localhost', 2222)
 			);
 		} else {
+			log.info('disable logger');
+
 			logger.disable();
 		}
 	};
@@ -83,6 +107,15 @@ define([
 	};
 
 	/**
+	 * Sets up the dispatcher.
+	 *
+	 * @private
+	 */
+	Application.prototype._setupDispatcher = function() {
+		this.dispatcher.init(activities, '#application-wrap');
+	};
+
+	/**
 	 * Sets up the router.
 	 *
 	 * @private
@@ -95,18 +128,6 @@ define([
 	};
 
 	/**
-	 * Sets up the application root component.
-	 *
-	 * @private
-	 */
-	Application.prototype._setupRootComponent = function() {
-		React.renderComponent(
-			new RootComponent(null),
-			document.getElementById('application-wrap')
-		);
-	};
-
-	/**
 	 * Handles router matched route.
 	 *
 	 * @param {string} routeName Name of the matched route
@@ -116,6 +137,8 @@ define([
 	 */
 	Application.prototype._handleRouteMatched = function(routeName, routeInfo, parameters) {
 		log.info('handle route match', routeName, routeInfo, parameters);
+
+		this.dispatcher.dispatch(routeName, routeInfo, parameters);
 	};
 
 	/**

@@ -20,7 +20,11 @@ module.exports = function (grunt) {
 					'../app/src/**/*.js',
 					'../app/models/**/*.js',
 					'../app/stores/**/*.js',
-					'../app/lib/reactor/**/*.js'
+					'../app/lib/reactor/**/*.js',
+					'../app/app.js',
+					'../app/stores.js',
+					'../app/routes.js',
+					'../app/activities.js'
 				]
 			}
 		},
@@ -96,7 +100,6 @@ module.exports = function (grunt) {
 						// main directories
 						src: 'src',
 						lib: 'lib',
-						config: 'config',
 						components: 'components-build',
 
 						// library directories
@@ -107,12 +110,16 @@ module.exports = function (grunt) {
 						React: 'lib/react/react-with-addons',
 						EventEmitter: 'lib/eventemitter/EventEmitter',
 						Director: 'lib/director/director',
+						AbstractActivity: 'lib/reactor/AbstractActivity',
 
 						// shortcuts to singletons
 						logger: 'lib/logviking/Logger',
 						intent: 'lib/reactor/Intent',
 						router: 'lib/reactor/Router',
-						navi: 'lib/reactor/Navi'
+						navi: 'lib/reactor/Navi',
+						dispatcher: 'lib/reactor/Dispatcher',
+						config: 'config/config',
+						environment: 'config/environment'
 					},
 					shim: {
 						jquery: {
@@ -211,5 +218,5 @@ module.exports = function (grunt) {
 	grunt.registerTask('jsx', ['watch:jsx']);
 	grunt.registerTask('server-dev', ['connect:dev']);
 	grunt.registerTask('server-production', ['build', 'connect:production']);
-	grunt.registerTask('default', ['build', 'doc', 'server-dev']);
+	grunt.registerTask('default', ['build', 'doc']);
 };

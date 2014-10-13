@@ -1,9 +1,7 @@
 define([
-	'logger'
-], function(logger) {
+], function(
+) {
 	'use strict';
-	
-	var log = logger.get('routes');
 
 	return {
 		index: {
@@ -22,5 +20,5 @@ define([
 			path: '/users/:id',
 			activity: 'userInfo'
 		}
-	}
+	};
 });

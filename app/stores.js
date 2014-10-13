@@ -7,5 +7,5 @@ define([
 
 	return {
 		todo: new TodoStore()
-	}
+	};
 });
