@@ -94,41 +94,7 @@ module.exports = function (grunt) {
 		requirejs: {
 			combined: {
 				options: {
-					baseUrl: '../dist',
-					// TODO extract this from app.js?
-					paths: {
-						// main directories
-						src: 'src',
-						lib: 'lib',
-						components: 'components-build',
-
-						// library directories
-						logviking: 'lib/logviking',
-
-						// specific components
-						jquery: 'lib/jquery/jquery-2.1.1.min',
-						React: 'lib/react/react-with-addons',
-						EventEmitter: 'lib/eventemitter/EventEmitter',
-						Director: 'lib/director/director',
-						AbstractActivity: 'lib/reactor/AbstractActivity',
-
-						// shortcuts to singletons
-						logger: 'lib/logviking/Logger',
-						intent: 'lib/reactor/Intent',
-						router: 'lib/reactor/Router',
-						navi: 'lib/reactor/Navi',
-						dispatcher: 'lib/reactor/Dispatcher',
-						config: 'config/config',
-						environment: 'config/environment'
-					},
-					shim: {
-						jquery: {
-							exports: '$'
-						},
-						Director: {
-							exports: 'Router'
-						}
-					},
+					mainConfigFile: '../dist/app.js',
 					name: 'src/Application',
 					out: '../dist/app.build.js',
 					almond: true,
