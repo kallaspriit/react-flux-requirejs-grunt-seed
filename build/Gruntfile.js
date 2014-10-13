@@ -12,12 +12,15 @@ module.exports = function (grunt) {
 		// validates JavaScript for errors and style
 		// https://github.com/gruntjs/grunt-contrib-jshint
 		jshint: {
-			ui: {
+			app: {
 				options: {
-					jshintrc: '../client/.jshintrc'
+					jshintrc: '../app/.jshintrc'
 				},
 				src: [
-					'../client/src/**/*.js',
+					'../app/src/**/*.js',
+					'../app/models/**/*.js',
+					'../app/stores/**/*.js',
+					'../app/lib/reactor/**/*.js'
 				]
 			}
 		},
@@ -82,7 +85,6 @@ module.exports = function (grunt) {
 
 						// library directories
 						logviking: 'lib/logviking',
-						reactor: 'lib/reactor',
 
 						// specific components
 						jquery: 'lib/jquery/jquery-2.1.1.min',
@@ -90,9 +92,11 @@ module.exports = function (grunt) {
 						EventEmitter: 'lib/eventemitter/EventEmitter',
 						Director: 'lib/director/director',
 
-						// shortcuts
+						// shortcuts to singletons
 						logger: 'lib/logviking/Logger',
-						intent: 'lib/reactor/Intent'
+						intent: 'lib/reactor/Intent',
+						router: 'lib/reactor/Router',
+						navi: 'lib/reactor/Navi'
 					},
 					shim: {
 						jquery: {

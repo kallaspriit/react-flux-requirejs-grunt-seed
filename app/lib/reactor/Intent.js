@@ -1,7 +1,10 @@
 define([
 	'EventEmitter',
 	'logger'
-], function(EventEmitter, logger) {
+], function(
+	EventEmitter,
+	logger
+) {
 	'use strict';
 	
 	var log = logger.get('Intent');
@@ -10,14 +13,16 @@ define([
 		EventEmitter.call(this);
 
 		this._actionToMethodMap = {};
+		this._intents = [];
+		this._intentCount = {};
 	};
 
 	Intent.prototype = Object.create(EventEmitter.prototype);
 
 	Intent.prototype.listen = function() {
 		var argumentCount = arguments.length,
-			actionName,
-			actionMethod,
+			intentName,
+			callbackFunction,
 			i;
 
 		// validate argument count
@@ -29,36 +34,52 @@ define([
 
 		// extract the actions
 		for (i = 0; i < arguments.length; i += 2) {
-			actionName = arguments[i];
-			actionMethod = arguments[i + 1];
+			intentName = arguments[i];
+			callbackFunction = arguments[i + 1];
 
-			if (typeof actionName !== 'string') {
+			if (typeof intentName !== 'string') {
 				throw new Error(
-					'Expected a string as action name for parameter #' + i + ' but got ' + typeof actionName
+					'Expected a string as action name for parameter #' + i + ' but got ' + typeof intentName
 				);
-			} else if (typeof actionMethod !== 'function') {
+			} else if (typeof callbackFunction !== 'function') {
 				throw new Error(
-					'Expected a function as action method for parameter #' + i + ' but got ' + typeof actionMethod
+					'Expected a function as action method for parameter #' + i + ' but got ' + typeof callbackFunction
 				);
 			}
 
 			// register the intent action name under intent object
-			this[actionName] = actionName;
+			this._registerIntent(intentName);
 
 			// add action method to the mapping
-			if (typeof this._actionToMethodMap[actionName] === 'undefined') {
-				this._actionToMethodMap[actionName] = [];
+			if (typeof this._actionToMethodMap[intentName] === 'undefined') {
+				this._actionToMethodMap[intentName] = [];
 			}
 
-			this._actionToMethodMap[actionName].push(actionMethod);
+			this._actionToMethodMap[intentName].push(callbackFunction);
 
 			// listen for the given action and forward to the registered method
-			this.on(actionName, actionMethod);
+			this.on(intentName, callbackFunction);
+
+			log.info('added listener for ' + intentName + ' (' + this._intentCount[intentName] + ' total)');
 		}
 	};
 
-	Intent.prototype.emits = function(actionName) {
-		this[actionName] = actionName;
+	Intent.prototype.emits = function(intentName) {
+		this._registerIntent(intentName);
+
+		log.info('added emitter called ' + intentName + ' (' + this._intentCount[intentName] + ' total)');
+	};
+
+	Intent.prototype._registerIntent = function(intentName) {
+		if (this._intents.indexOf(intentName) !== -1) {
+			this._intentCount[intentName]++;
+
+			return;
+		}
+
+		this[intentName] = intentName;
+		this._intents.push(intentName);
+		this._intentCount[intentName] = 1;
 	};
 
     return new Intent();

@@ -2,8 +2,9 @@
 define([
 	'React',
 	'logger',
-	'reactor/Router'
-], function(React, logger, router) {
+	'router',
+	'navi'
+], function(React, logger, router, navi) {
 	'use strict';
 	
 	var log = logger.get('LinkComponent');
@@ -17,7 +18,7 @@ define([
 		},
 
 		onClick: function(e) {
-			router.setPath(this.state.routePath);
+			navi.go(this.state.routePath);
 
 			e.preventDefault();
 		},
@@ -29,8 +30,7 @@ define([
 				var routeName = this.props.route,
 					parameters = {},
 					ignoreProps = ['route', 'children'],
-					propName,
-					routePath;
+					propName;
 
 				for (propName in this.props) {
 					if (ignoreProps.indexOf(propName) !== -1) {
@@ -45,14 +45,14 @@ define([
 		},
 
 		render: function () {
-			log.info('render');
-
 			var linkHref = this.state.routePath;
 
 			if (!router.isUsingHtml5Mode()) {
 				linkHref = '#' + linkHref;
 			}
-		
+
+			log.info('render ' + linkHref);
+
 			return (
 				React.DOM.a({href: linkHref, onClick: this.onClick}, this.props.children)
 			);

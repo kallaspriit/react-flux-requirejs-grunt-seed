@@ -13,7 +13,6 @@ requirejs.config({
 
 		// library directories
 		logviking: 'lib/logviking',
-		reactor: 'lib/reactor',
 
 		// specific components
 		jquery: 'lib/jquery/jquery-2.1.1.min',
@@ -21,9 +20,11 @@ requirejs.config({
 		EventEmitter: 'lib/eventemitter/EventEmitter',
 		Director: 'lib/director/director',
 
-		// shortcuts
+		// shortcuts to singletons
 		logger: 'lib/logviking/Logger',
-		intent: 'lib/reactor/Intent'
+		intent: 'lib/reactor/Intent',
+		router: 'lib/reactor/Router',
+		navi: 'lib/reactor/Navi'
 	},
 
 	// configuration of exports and dependencies

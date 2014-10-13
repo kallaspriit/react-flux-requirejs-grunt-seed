@@ -1,7 +1,10 @@
 define([
 	'jquery',
 	'logger'
-], function($, logger) {
+], function(
+	$,
+	logger
+) {
 	'use strict';
 	
 	var log = logger.get('TodoItemModel');

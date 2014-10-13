@@ -1,34 +1,47 @@
 define([
-	'logger',
+	'React',
 	'logviking/ConsoleLog',
 	'logviking/SocketLog',
+	'logger',
 	'stores',
 	'routes',
-	'React',
-	'reactor/Router',
+	'router',
+	'navi',
 	'components/RootComponent'
-], function(logger, ConsoleLog, SocketLog, stores, routes, React, router, RootComponent) {
+], function(
+	React,
+	ConsoleLog,
+	SocketLog,
+	logger,
+	stores,
+	routes,
+	router,
+	navi,
+	RootComponent
+) {
 	'use strict';
 	
 	var log = logger.get('Application');
 
 	var Application = function() {
-		this._router = null;
+		this._router = router;
+		this._navi = navi;
 	};
 	
 	Application.prototype.bootstrap = function() {
-		this._setupLogger();
-
 		log.info('bootstrap');
 
+		this._setupLogger();
 		this._setupDummyData();
 		this._setupRouter();
 		this._setupRootComponent();
 	};
 
 	Application.prototype._setupLogger = function() {
-		logger.addReporter(new ConsoleLog());
-		logger.addReporter(new SocketLog('localhost', 2222));
+		logger.addReporters(
+			new ConsoleLog(),
+			new SocketLog('localhost', 2222)
+		);
 	};
 
 	Application.prototype._setupDummyData = function() {
@@ -38,7 +51,6 @@ define([
 	};
 
 	Application.prototype._setupRouter = function() {
-		this._router = router;
 		this._router.init(routes, this._handleRouteMatch.bind(this));
 	};
 

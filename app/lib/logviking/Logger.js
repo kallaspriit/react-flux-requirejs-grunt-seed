@@ -14,6 +14,7 @@ define([
 		this._levels = ['log', 'info', 'warn', 'error'];
 		this._reporters = [];
 		this._loggers = {};
+		this._preReportersQueue = [];
 	};
 
 	/**
@@ -64,6 +65,32 @@ define([
 	 */
 	Logger.prototype.addReporter = function(reporter) {
 		this._reporters.push(reporter);
+
+		this._reportQueuedMessages();
+	};
+
+	/**
+	 * Registers a list of new log reporter.
+	 *
+	 * The reporter should be an object with methods called:
+	 * - log
+	 * - info
+	 * - warn
+	 * - error
+	 *
+	 * @method addReporters
+	 * @param {Object} reporter1 First reporter to add
+	 * @param {Object} [reporter2] Second reporter to add
+	 * @param {Object} [reporterN] Any number of reporters can follow
+	 */
+	Logger.prototype.addReporters = function(/*reporter1, reporter2, reporterN*/) {
+		var i;
+
+		for (i = 0; i < arguments.length; i++) {
+			this.addReporter(arguments[i]);
+		}
+
+		this._reportQueuedMessages();
 	};
 
 	/**
@@ -121,11 +148,31 @@ define([
 			this._components.push(component);
 		}
 
-		for (i = 0; i < this._reporters.length; i++) {
-			this._reporters[i][type].apply(
-				this._reporters[i],
-				Array.prototype.slice.call(arguments, 0).slice(1)
-			);
+		if (this._reporters.length > 0) {
+			for (i = 0; i < this._reporters.length; i++) {
+				this._reporters[i][type].apply(
+					this._reporters[i],
+					Array.prototype.slice.call(arguments, 0).slice(1)
+				);
+			}
+		} else {
+			this._preReportersQueue.push(Array.prototype.slice.call(arguments, 0));
+		}
+	};
+
+	/**
+	 * Re-logs the queued messages that were registered when no reporters had beed added.
+	 *
+	 * @method _reportQueuedMessages
+	 * @private
+	 */
+	Logger.prototype._reportQueuedMessages = function() {
+		var message;
+
+		while (this._preReportersQueue.length > 0) {
+			message = this._preReportersQueue.shift();
+
+			this._log.apply(this, message);
 		}
 	};
 

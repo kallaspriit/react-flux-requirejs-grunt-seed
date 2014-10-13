@@ -1,8 +1,12 @@
 define([
+	'models/TodoItemModel',
 	'logger',
-	'intent',
-	'models/TodoItemModel'
-], function(logger, intent, TodoItemModel) {
+	'intent'
+], function(
+	TodoItemModel,
+	logger,
+	intent
+) {
 	'use strict';
 	
 	var log = logger.get('TodoStore');

@@ -1,17 +1,26 @@
 define([
-	'logger',
-	'Director'
-], function(logger, Director) {
+	'Director',
+	'jquery',
+	'logger'
+], function(
+	Director,
+	$,
+	logger
+) {
 	'use strict';
 	
 	var log = logger.get('Router');
 
 	// based on Director - https://github.com/flatiron/director
-	var Router = function() {
+	var Router = function(config) {
 		this._router = null;
 		this._routes = {};
 		this._config = {
-			useHtml5Mode: true
+			useHtml5Mode: false
+		};
+
+		if (typeof config === 'object' && config !== null) {
+			$.extend(this._config, config);
 		}
 	};
 	
@@ -88,11 +97,11 @@ define([
 			if (typeof handlerCallback === 'function') {
 				handlerCallback(routeName, routeInfo, parameters);
 			}
-		}
+		};
 	};
 
 	Router.prototype._onUrlNotMatched = function() {
-		debugger;
+
 	};
 
     return new Router();
