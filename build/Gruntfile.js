@@ -25,6 +25,22 @@ module.exports = function (grunt) {
 			}
 		},
 
+		// generates documentation from code
+		// https://github.com/krampstudio/grunt-jsdoc
+		jsdoc : {
+			dist : {
+				src: [
+					'../app/src/**/*.js',
+					'../app/models/**/*.js',
+					'../app/stores/**/*.js',
+					'../app/lib/reactor/**/*.js'
+				],
+				options: {
+					destination: '../doc'
+				}
+			}
+		},
+
 		// cleans directories
 		// https://github.com/gruntjs/grunt-contrib-clean
 		clean: {
@@ -182,6 +198,7 @@ module.exports = function (grunt) {
 
 	// register composite tasks
 	grunt.registerTask('build', [
+		'lint',
 		'react:jsx',
 		'clean:preDist',
 		'copy:dist',
@@ -189,8 +206,10 @@ module.exports = function (grunt) {
 		'string-replace:distScript',
 		'clean:postDist'
 	]);
+	grunt.registerTask('lint', ['jshint']);
+	grunt.registerTask('doc', ['jsdoc:dist']);
 	grunt.registerTask('jsx', ['watch:jsx']);
 	grunt.registerTask('server-dev', ['connect:dev']);
 	grunt.registerTask('server-production', ['build', 'connect:production']);
-	grunt.registerTask('default', ['build', 'server-dev']);
+	grunt.registerTask('default', ['build', 'doc', 'server-dev']);
 };

@@ -9,8 +9,19 @@ define([
 	
 	var log = logger.get('Navi');
 
+	/**
+	 * Navigation component.
+	 *
+	 * @constructor
+	 */
 	var Navi = function() {};
-	
+
+	/**
+	 * Navigates to a path or a route.
+	 *
+	 * @param {string} routeOrPath Route name or path to navigate to
+	 * @param {object} [parameters] Optional map of parameters
+	 */
 	Navi.prototype.go = function(routeOrPath, parameters) {
 		var startingChar = routeOrPath.substr(0, 1);
 

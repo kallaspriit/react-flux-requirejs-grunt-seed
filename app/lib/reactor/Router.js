@@ -1,9 +1,11 @@
 define([
 	'Director',
+	'EventEmitter',
 	'jquery',
 	'logger'
 ], function(
 	Director,
+	EventEmitter,
 	$,
 	logger
 ) {
@@ -12,22 +14,31 @@ define([
 	var log = logger.get('Router');
 
 	// based on Director - https://github.com/flatiron/director
-	var Router = function(config) {
+	var Router = function() {
+		EventEmitter.call(this);
+
 		this._router = null;
 		this._routes = {};
 		this._config = {
 			useHtml5Mode: false
 		};
+	};
+
+	Router.prototype = Object.create(EventEmitter.prototype);
+
+	Router.Event = Router.prototype.Event = {
+		ROUTE_MATCHED: 'ROUTE_MATCHED',
+		URL_NOT_MATCHED: 'URL_NOT_MATCHED'
+	};
+	
+	Router.prototype.init = function(routes, config) {
+		log.info('init');
+
+		this._routes = routes;
 
 		if (typeof config === 'object' && config !== null) {
 			$.extend(this._config, config);
 		}
-	};
-	
-	Router.prototype.init = function(routes, handlerCallback) {
-		log.info('init');
-
-		this._routes = routes;
 
 		var configuration = this._getConfiguration(),
 			routeHandlers = {},
@@ -37,7 +48,7 @@ define([
 		for (routeName in routes) {
 			route = routes[routeName];
 
-			routeHandlers[route.path] = this._createRouteHandler(routeName, route, handlerCallback);
+			routeHandlers[route.path] = this._createRouteHandler(routeName, route);
 		}
 
 		this._router = new Director(routeHandlers);
@@ -88,20 +99,20 @@ define([
 		};
 	};
 
-	Router.prototype._createRouteHandler = function(routeName, routeInfo, handlerCallback) {
+	Router.prototype._createRouteHandler = function(routeName, routeInfo) {
 		return function() {
 			var parameters = Array.prototype.slice.call(arguments, 0);
 
 			log.info('matched route "' + routeName + '"', routeInfo);
 
-			if (typeof handlerCallback === 'function') {
-				handlerCallback(routeName, routeInfo, parameters);
-			}
-		};
+			this.emit(this.Event.ROUTE_MATCHED, routeName, routeInfo, parameters);
+		}.bind(this);
 	};
 
 	Router.prototype._onUrlNotMatched = function() {
+		log.warn('current url failed to match any routes');
 
+		this.emit(this.Event.URL_NOT_MATCHED, this._router.getRoute());
 	};
 
     return new Router();

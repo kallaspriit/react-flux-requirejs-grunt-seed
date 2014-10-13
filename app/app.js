@@ -8,7 +8,6 @@ requirejs.config({
 		// main directories
 		src: 'src',
 		lib: 'lib',
-		config: 'config',
 		components: 'components-build',
 
 		// library directories
@@ -24,7 +23,9 @@ requirejs.config({
 		logger: 'lib/logviking/Logger',
 		intent: 'lib/reactor/Intent',
 		router: 'lib/reactor/Router',
-		navi: 'lib/reactor/Navi'
+		navi: 'lib/reactor/Navi',
+		config: 'config/config',
+		environment: 'config/environment'
 	},
 
 	// configuration of exports and dependencies

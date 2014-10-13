@@ -14,14 +14,10 @@ define([
 		
 			return (
 				React.DOM.ul(null, 
-					React.DOM.li(null, React.DOM.a({href: "#/todo"}, "ToDo")), 
-					React.DOM.li(null, React.DOM.a({href: "#/users"}, "Users")), 
-					React.DOM.li(null, React.DOM.a({href: "#/users/2"}, "User")), 
-					React.DOM.li(null, React.DOM.a({href: "#/foobar"}, "Foobar")), 
-					React.DOM.li(null, "---"), 
 					React.DOM.li(null, Link({href: "/users/10"}, "User 10")), 
 					React.DOM.li(null, Link({route: "todo"}, "ToDo route")), 
-					React.DOM.li(null, Link({route: "user", id: "5"}, "User 5 route"))
+					React.DOM.li(null, Link({route: "user", id: "5"}, "User 5 route")), 
+					React.DOM.li(null, Link({href: "/foobar"}, "Invalid route path"))
 				)
 			);
 		}

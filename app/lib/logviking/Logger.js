@@ -52,6 +52,23 @@ define([
 	};
 
 	/**
+	 * Disables the logger and removes overhead.
+	 */
+	Logger.prototype.disable = function() {
+		// return dummy interface from get()
+		this.get = function() {
+			var logInterface = {},
+				i;
+
+			for (i = 0; i < this._levels.length; i++) {
+				logInterface[this._levels[i]] = function () {}; // do nothing
+			}
+
+			return logInterface;
+		};
+	};
+
+	/**
 	 * Registers a new log reporter.
 	 *
 	 * The reporter should be an object with methods called:
