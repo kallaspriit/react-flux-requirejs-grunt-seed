@@ -11,7 +11,8 @@ define([
 		debug: false,
 
 		router: {
-			useHtml5Mode: true
+			defaultRoutePath: '/',
+			useHtml5Mode: false
 		}
 	}, environment);
 });

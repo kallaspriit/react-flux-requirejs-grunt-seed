@@ -110,6 +110,8 @@ module.exports = function (grunt) {
 			}
 		},
 
+		// modifies files by replacing some content
+		// https://github.com/erickrdch/grunt-string-replace
 		'string-replace': {
 			distScript: {
 				files: {
@@ -126,21 +128,30 @@ module.exports = function (grunt) {
 
 		// https://github.com/ericclemmons/grunt-react
 		react: {
-			jsx: {
+			app: {
 				expand: true,
 				cwd: '../app/components',
 				src: ['**/*.jsx'],
 				dest: '../app/components-build',
-				ext: '.js',
-				watch: true
+				ext: '.js'
+			},
+			test: {
+				expand: true,
+				cwd: '../test/specs/components',
+				src: ['**/*.jsx'],
+				dest: '../test/specs/components-build',
+				ext: '.js'
 			}
 		},
 
 		// https://github.com/gruntjs/grunt-contrib-watch
 		watch: {
 			jsx: {
-				files: ['../app/components/**/*.jsx'],
-				tasks: ['react:jsx'],
+				files: [
+					'../app/components/**/*.jsx',
+					'../test/specs/components/**/*.jsx'
+				],
+				tasks: ['react'],
 				options: {
 					spawn: false
 				}
@@ -166,13 +177,20 @@ module.exports = function (grunt) {
 					keepalive: true
 				}
 			}
-		}
+		},
+
+		// executes tests using karma test runner
+		// https://github.com/karma-runner/grunt-karma
+		karma: {
+            unit: {
+                configFile: 'karma.conf.js'
+            }
+        },
 	});
 
 	// register composite tasks
 	grunt.registerTask('build', [
-		'lint',
-		'react:jsx',
+		'react:app',
 		'clean:preDist',
 		'copy:dist',
 		'requirejs:combined',
@@ -180,9 +198,10 @@ module.exports = function (grunt) {
 		'clean:postDist'
 	]);
 	grunt.registerTask('lint', ['jshint']);
+	grunt.registerTask('test', ['react', 'karma']);
 	grunt.registerTask('doc', ['jsdoc:dist']);
 	grunt.registerTask('jsx', ['watch:jsx']);
 	grunt.registerTask('server-dev', ['connect:dev']);
 	grunt.registerTask('server-production', ['build', 'connect:production']);
-	grunt.registerTask('default', ['build', 'doc']);
+	grunt.registerTask('default', ['lint', 'test', 'build', 'doc']);
 };

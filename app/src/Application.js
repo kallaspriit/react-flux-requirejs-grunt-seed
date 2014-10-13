@@ -1,10 +1,6 @@
 define([
 	'logviking/ConsoleLog',
 	'logviking/SocketLog',
-	'config',
-	'stores',
-	'routes',
-	'activities',
 	'logger',
 	'navi',
 	'router',
@@ -13,10 +9,6 @@ define([
 ], function(
 	ConsoleLog,
 	SocketLog,
-	config,
-	stores,
-	routes,
-	activities,
 	logger,
 	navi,
 	router,
@@ -32,7 +24,7 @@ define([
 	 *
 	 * @constructor
 	 */
-	var Application = function() {
+	var Application = function(config, stores, routes, activities) {
 		// the main components are registered below for debugging on the console, don't rely on them in your app
 
 		/* @type Object */
@@ -81,7 +73,7 @@ define([
 	 * @private
 	 */
 	Application.prototype._setupLogger = function() {
-		if (config.debug) {
+		if (this.config.debug) {
 			log.info('setup logger in debug mode');
 
 			logger.addReporters(
@@ -101,9 +93,9 @@ define([
 	 * @private
 	 */
 	Application.prototype._setupDummyData = function() {
-		stores.todo.addTodoItem({ text: 'first item ', isDone: true });
-		stores.todo.addTodoItem({ text: 'second item ' });
-		stores.todo.addTodoItem({ text: 'third item ' });
+		this.stores.todo.addTodoItem({ text: 'first item ', isDone: true });
+		this.stores.todo.addTodoItem({ text: 'second item ' });
+		this.stores.todo.addTodoItem({ text: 'third item ' });
 	};
 
 	/**
@@ -112,7 +104,7 @@ define([
 	 * @private
 	 */
 	Application.prototype._setupDispatcher = function() {
-		this.dispatcher.init(activities, '#application-wrap');
+		this.dispatcher.init(this.activities, '#application-wrap');
 	};
 
 	/**
@@ -124,7 +116,7 @@ define([
 		this.router.on(this.router.Event.ROUTE_MATCHED, this._handleRouteMatched.bind(this));
 		this.router.on(this.router.Event.URL_NOT_MATCHED, this._handleUrlNotMatched.bind(this));
 
-		this.router.init(routes, config.router);
+		this.router.init(this.routes, this.config.router);
 	};
 
 	/**

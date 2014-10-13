@@ -1,10 +1,12 @@
 /** @jsx React.DOM */
 define([
 	'React',
-	'logger'
+	'logger',
+	'components/CheckboxWithLabelComponent'
 ], function(
 	React,
-	logger
+	logger,
+	CheckboxWithLabelComponent
 ) {
 	'use strict';
 	
@@ -15,7 +17,10 @@ define([
 			log.info('render');
 		
 			return (
-				React.DOM.div(null, "UsersComponent")
+				React.DOM.div(null, 
+					React.DOM.h2(null, "UsersComponent"), 
+					CheckboxWithLabelComponent({labelOn: "Yes", labelOff: "No"})
+				)
 			);
 		}
 	});

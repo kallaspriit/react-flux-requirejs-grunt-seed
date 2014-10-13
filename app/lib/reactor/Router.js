@@ -53,7 +53,7 @@ define([
 
 		this._router = new Director(routeHandlers);
 		this._router.configure(configuration);
-		this._router.init();
+		this._router.init(this._config.defaultRoutePath);
 	};
 
 	Router.prototype.isUsingHtml5Mode = function() {
