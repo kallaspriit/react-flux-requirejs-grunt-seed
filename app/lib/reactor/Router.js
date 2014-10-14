@@ -53,6 +53,9 @@ define([
 
 		this._router = new Director(routeHandlers);
 		this._router.configure(configuration);
+	};
+
+	Router.prototype.start = function() {
 		this._router.init(this._config.defaultRoutePath);
 	};
 

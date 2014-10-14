@@ -27,18 +27,18 @@ define([
 			var util = React.addons.TestUtils,
 				app = new Application(config, stores, routes, activities);
 
-			app.bootstrap();
-
-			//var todoComponent = util.findRenderedDOMComponentWithTag(null, 'TodoComponent');
+			app.init();
 
 			expect(true).toEqual(true);
 
-			/*var util = React.addons.TestUtils,
-				component = util.renderIntoDocument(
+			var component = util.renderIntoDocument(
 					<TodoComponent/>
-				);
+				),
+				inputs = util.scryRenderedDOMComponentsWithTag(component, 'input');
 
-			expect(true).toEqual(true);*/
+			expect(inputs.length).toEqual(4);
+
+			debugger;
 		});
 	});
 });

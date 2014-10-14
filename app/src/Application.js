@@ -56,15 +56,33 @@ define([
 	};
 
 	/**
-	 * Bootstraps the application
+	 * Initializes the application.
+	 *
+	 * @returns Application
 	 */
-	Application.prototype.bootstrap = function() {
-		log.info('bootstrap');
+	Application.prototype.init = function() {
+		log.info('initializing');
 
 		this._setupLogger();
 		this._setupDummyData();
+		this._setupNavi();
 		this._setupDispatcher();
 		this._setupRouter();
+
+		return this;
+	};
+
+	/**
+	 * Bootstraps the application.
+	 *
+	 * @returns Application
+	 */
+	Application.prototype.bootstrap = function() {
+		log.info('bootstrapping');
+
+		this.router.start();
+
+		return this;
 	};
 
 	/**
@@ -93,9 +111,22 @@ define([
 	 * @private
 	 */
 	Application.prototype._setupDummyData = function() {
+		log.info('setup dummy data');
+
 		this.stores.todo.addTodoItem({ text: 'first item ', isDone: true });
 		this.stores.todo.addTodoItem({ text: 'second item ' });
 		this.stores.todo.addTodoItem({ text: 'third item ' });
+	};
+
+	/**
+	 * Sets up the navigator.
+	 *
+	 * @private
+	 */
+	Application.prototype._setupNavi = function() {
+		log.info('setup navigator');
+
+		intent.on(intent.NAVIGATE_TO_PATH, this._handleNavigateToPath.bind(this));
 	};
 
 	/**
@@ -104,6 +135,8 @@ define([
 	 * @private
 	 */
 	Application.prototype._setupDispatcher = function() {
+		log.info('setup dispatcher');
+
 		this.dispatcher.init(this.activities, '#application-wrap');
 	};
 
@@ -113,10 +146,24 @@ define([
 	 * @private
 	 */
 	Application.prototype._setupRouter = function() {
+		log.info('setup router');
+
 		this.router.on(this.router.Event.ROUTE_MATCHED, this._handleRouteMatched.bind(this));
 		this.router.on(this.router.Event.URL_NOT_MATCHED, this._handleUrlNotMatched.bind(this));
 
 		this.router.init(this.routes, this.config.router);
+	};
+
+	/**
+	 * Handles intent to navigate to a path.
+	 *
+	 * @param {string} path Path to navigate to
+	 * @private
+	 */
+	Application.prototype._handleNavigateToPath = function(path) {
+		log.info('handling navigate to path: ' + path);
+
+		this.router.setPath(path);
 	};
 
 	/**
@@ -130,7 +177,13 @@ define([
 	Application.prototype._handleRouteMatched = function(routeName, routeInfo, parameters) {
 		log.info('handle route match', routeName, routeInfo, parameters);
 
-		this.dispatcher.dispatch(routeName, routeInfo, parameters);
+		try {
+			this.dispatcher.dispatch(routeName, routeInfo, parameters);
+		} catch (e) {
+			log.error('dispatching route "' + routeName + '" failed: ' + e.message);
+
+			navi.go('index');
+		}
 	};
 
 	/**

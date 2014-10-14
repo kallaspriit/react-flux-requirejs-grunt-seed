@@ -28,7 +28,7 @@ define([
 	};
 
 	// all stores have their own prefix TODO_ etc
-	TodoStore.Action = {
+	TodoStore.Action = TodoStore.prototype.Action = {
 		TODO_ADD_ITEM: 'TODO_ADD_ITEM',
 		TODO_REMOVE_ITEM: 'TODO_REMOVE_ITEM',
 		TODO_TOGGLE_ITEM: 'TODO_TOGGLE_ITEM',

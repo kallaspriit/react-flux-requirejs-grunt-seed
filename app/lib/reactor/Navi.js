@@ -1,9 +1,11 @@
 define([
 	'logger',
-	'router'
+	'router',
+	'intent'
 ], function(
 	logger,
-	router
+	router,
+	intent
 ) {
 	'use strict';
 	
@@ -14,7 +16,13 @@ define([
 	 *
 	 * @constructor
 	 */
-	var Navi = function() {};
+	var Navi = function() {
+		intent.emits(Navi.Action.NAVIGATE_TO_PATH);
+	};
+
+	Navi.Action = Navi.prototype.Action = {
+		NAVIGATE_TO_PATH: 'NAVIGATE_TO_PATH'
+	};
 
 	/**
 	 * Navigates to a path or a route.
@@ -23,19 +31,20 @@ define([
 	 * @param {object} [parameters] Optional map of parameters
 	 */
 	Navi.prototype.go = function(routeOrPath, parameters) {
-		var startingChar = routeOrPath.substr(0, 1);
+		var startingChar = routeOrPath.substr(0, 1),
+			routePath;
 
 		if (startingChar === '/' || startingChar === '#') {
-			log.info('navigating to path: ' + routeOrPath);
-
-			router.setPath(routeOrPath);
+			routePath = routeOrPath;
 		} else {
 			parameters = parameters || {};
 
-			log.info('navigating to route: ' + routeOrPath, parameters);
-
-			router.setRoute(routeOrPath, parameters);
+			routePath = router.getRoutePath(routeOrPath, parameters);
 		}
+
+		log.info('navigating to path: ' + routePath);
+
+		intent.emit(Navi.Action.NAVIGATE_TO_PATH, routePath);
 	};
 
     return new Navi();

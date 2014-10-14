@@ -70,6 +70,12 @@ define([
 		log.info('added emitter called ' + intentName + ' (' + this._intentCount[intentName] + ' total)');
 	};
 
+	Intent.prototype.emit = function(intent) {
+		log.info('emit intent', intent);
+
+		return EventEmitter.prototype.emit.apply(this, arguments);
+	};
+
 	Intent.prototype._registerIntent = function(intentName) {
 		if (this._intents.indexOf(intentName) !== -1) {
 			this._intentCount[intentName]++;
