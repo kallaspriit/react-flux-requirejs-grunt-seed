@@ -77,6 +77,14 @@ define([
 		this.setPath(routePath);
 	};
 
+	Router.prototype.getRouteInfoByName = function(routeName) {
+		if (typeof this._routes[routeName] === 'undefined') {
+			return null;
+		}
+
+		return this._routes[routeName];
+	};
+
 	Router.prototype.getRoutePath = function(routeName, parameters) {
 		if (typeof this._routes[routeName] === 'undefined') {
 			throw new Error('Route called "' + routeName + '" not found');

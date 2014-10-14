@@ -2,12 +2,14 @@ define([
 	'AbstractActivity',
 	'React',
 	'jquery',
-	'logger'
+	'logger',
+	'util'
 ], function(
 	AbstractActivity,
 	React,
 	$,
-	logger
+	logger,
+	util
 ) {
 	'use strict';
 	
@@ -15,6 +17,10 @@ define([
 
 	var Dispatcher = function() {
 		this._activities = {};
+		this._activeRouteName = null;
+		this._activeRouteInfo = null;
+		this._activeRouteParameters = null;
+		this._activeActivityInstance = null;
 	};
 	
 	Dispatcher.prototype.init = function(activities, container) {
@@ -42,7 +48,7 @@ define([
 			throw new Error('Activity "' + activityName + '" is expected to extend the AbstractActivity class');
 		}
 
-		activityInstance.onCreate();
+		activityInstance.onCreate.apply(activityInstance, util.normalizeType(parameters));
 
 		viewComponent = activityInstance.getView();
 

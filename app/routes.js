@@ -13,11 +13,14 @@ define([
 			activity: 'todo'
 		},
 		users: {
-			path: '/users',
-			activity: 'users'
+			path: '/users/:page',
+			activity: 'users',
+			defaults: {
+				page: 1
+			}
 		},
 		user: {
-			path: '/users/:id',
+			path: '/user/:id',
 			activity: 'userInfo'
 		}
 	};

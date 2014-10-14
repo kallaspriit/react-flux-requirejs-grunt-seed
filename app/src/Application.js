@@ -175,15 +175,19 @@ define([
 	 * @private
 	 */
 	Application.prototype._handleRouteMatched = function(routeName, routeInfo, parameters) {
-		log.info('handle route match', routeName, routeInfo, parameters);
+		log.info('handle route match for "' + routeName + '"', routeInfo, parameters);
 
-		try {
+		//try {
 			this.dispatcher.dispatch(routeName, routeInfo, parameters);
-		} catch (e) {
+		/*} catch (e) {
 			log.error('dispatching route "' + routeName + '" failed: ' + e.message);
 
-			navi.go('index');
-		}
+			if (this.config.debug) {
+				throw e;
+			} else {
+				navi.go('index');
+			}
+		}*/
 	};
 
 	/**

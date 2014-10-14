@@ -17,10 +17,10 @@ define([
 
 	UsersActivity.prototype = Object.create(AbstractActivity.prototype);
 	
-	UsersActivity.prototype.onCreate = function() {
+	UsersActivity.prototype.onCreate = function(page) {
 		log.info('onCreate');
 
-		this.setView(new UsersComponent(null));
+		this.setView(new UsersComponent({ page: page }));
 	};
 
     return UsersActivity;

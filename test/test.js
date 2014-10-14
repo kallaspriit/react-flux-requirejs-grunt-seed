@@ -90,6 +90,7 @@ require.config({
 		router: 'lib/reactor/Router',
 		navi: 'lib/reactor/Navi',
 		dispatcher: 'lib/reactor/Dispatcher',
+		util: 'src/Util',
 		config: 'config/config',
 		environment: 'config/environment'
 	},
