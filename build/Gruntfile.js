@@ -102,6 +102,7 @@ module.exports = function (grunt) {
 						//startFile: 'fragments/almond-start.frag',
 						endFile: 'fragments/almond-end.frag'
 					},
+					include: ['../dist/config/config', '../dist/stores', '../dist/routes', '../dist/activities'],
 					optimize: 'none',
 					//optimize: 'uglify2',
 					generateSourceMaps: true,
@@ -121,6 +122,27 @@ module.exports = function (grunt) {
 					replacements: [{
 						pattern: /<script.*data-main.*requirejs.*<\/script>/i,
 						replacement: '<script src="app.build.js"></script>'
+					}]
+				}
+			},
+			// replace the requirejs additional include paths
+			distPaths: {
+				files: {
+					'../dist/app.build.js': ['../dist/app.build.js']
+				},
+				options: {
+					replacements: [{
+						pattern: '\'../dist/config/config',
+						replacement: '\'config'
+					}, {
+						pattern: '\'../dist/stores',
+						replacement: '\'stores'
+					}, {
+						pattern: '\'../dist/routes',
+						replacement: '\'routes'
+					}, {
+						pattern: '\'../dist/activities',
+						replacement: '\'activities'
 					}]
 				}
 			}
@@ -195,7 +217,8 @@ module.exports = function (grunt) {
 		'copy:dist',
 		'requirejs:combined',
 		'string-replace:distScript',
-		'clean:postDist'
+		'string-replace:distPaths',
+		//'clean:postDist'
 	]);
 	grunt.registerTask('lint', ['jshint']);
 	grunt.registerTask('test', ['react', 'karma']);

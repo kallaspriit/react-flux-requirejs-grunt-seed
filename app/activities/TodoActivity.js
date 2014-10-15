@@ -23,5 +23,9 @@ define([
 		this.setView(new TodoComponent(null));
 	};
 
+	TodoActivity.prototype.onDestroy = function(page) {
+		log.info('onDestroy');
+	};
+
     return TodoActivity;
 });

@@ -17,10 +17,12 @@ define([
 
 	var Dispatcher = function() {
 		this._activities = {};
-		this._activeRouteName = null;
-		this._activeRouteInfo = null;
-		this._activeRouteParameters = null;
-		this._activeActivityInstance = null;
+		this._active = {
+			routeName: null,
+			routeInfo: null,
+			routeParameters: null,
+			activityInstance: null
+		};
 	};
 	
 	Dispatcher.prototype.init = function(activities, container) {
@@ -35,20 +37,57 @@ define([
 
 		var activityName = routeInfo.activity,
 			activityClass = this.getActivityClassByName(activityName),
+			existingActivityExists = this._active.routeInfo !== null,
+			matchedExistingActivity = false,
+			updatedExistingActivity = false,
 			activityInstance,
 			viewComponent;
+
+		parameters = util.normalizeType(parameters);
 
 		if (activityClass === null) {
 			throw new Error('Activity called "' + activityName + '" was not found, check activities.js');
 		}
 
-		activityInstance = new [activityClass][0]();
+		if (existingActivityExists) {
+			if (this._active.routeInfo.activity === routeInfo.activity) {
+				log.info('already active activity requested');
 
-		if (!(activityInstance instanceof AbstractActivity)) {
-			throw new Error('Activity "' + activityName + '" is expected to extend the AbstractActivity class');
+				matchedExistingActivity = true;
+
+				if (typeof this._active.activityInstance.onUpdate === 'function') {
+					this._active.activityInstance.onUpdate.apply(this._active.activityInstance, parameters);
+
+					updatedExistingActivity = true;
+				}
+			}
 		}
 
-		activityInstance.onCreate.apply(activityInstance, util.normalizeType(parameters));
+		if (updatedExistingActivity) {
+			activityInstance = this._active.activityInstance;
+		} else {
+			if (existingActivityExists && !matchedExistingActivity) {
+				this._active.activityInstance.onDestroy.apply(
+					this._active.activityInstance,
+					[routeName, routeInfo, parameters]
+				);
+			}
+
+			activityInstance = new [activityClass][0]();
+
+			if (!(activityInstance instanceof AbstractActivity)) {
+				throw new Error('Activity "' + activityName + '" is expected to extend the AbstractActivity class');
+			}
+
+			activityInstance.onCreate.apply(activityInstance, parameters);
+		}
+
+		this._active = {
+			routeName: routeName,
+			routeInfo: routeInfo,
+			routeParameters: parameters,
+			activityInstance: activityInstance
+		};
 
 		viewComponent = activityInstance.getView();
 
