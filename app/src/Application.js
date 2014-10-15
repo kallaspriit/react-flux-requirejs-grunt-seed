@@ -1,14 +1,18 @@
 define([
+	'React',
 	'logviking/ConsoleLog',
 	'logviking/SocketLog',
+	'components/RootComponent',
 	'logger',
 	'navi',
 	'router',
 	'dispatcher',
 	'intent'
 ], function(
+	React,
 	ConsoleLog,
 	SocketLog,
+	RootComponent,
 	logger,
 	navi,
 	router,
@@ -66,7 +70,6 @@ define([
 		this._setupLogger();
 		this._setupDummyData();
 		this._setupNavi();
-		this._setupDispatcher();
 		this._setupRouter();
 
 		return this;
@@ -79,6 +82,11 @@ define([
 	 */
 	Application.prototype.bootstrap = function() {
 		log.info('bootstrapping');
+
+		this._setupRootComponent();
+		this._setupDispatcher();
+
+
 
 		this.router.start();
 
@@ -134,10 +142,24 @@ define([
 	 *
 	 * @private
 	 */
+	Application.prototype._setupRootComponent = function() {
+		log.info('setup root component');
+
+		React.renderComponent(
+			new RootComponent(null),
+			$(this.config.rootComponentWrap)[0]
+		);
+	};
+
+	/**
+	 * Sets up the dispatcher.
+	 *
+	 * @private
+	 */
 	Application.prototype._setupDispatcher = function() {
 		log.info('setup dispatcher');
 
-		this.dispatcher.init(this.activities, '#application-wrap');
+		this.dispatcher.init(this.activities, this.config.viewComponentWrap);
 	};
 
 	/**

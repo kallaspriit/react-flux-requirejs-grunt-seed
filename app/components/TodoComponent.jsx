@@ -2,14 +2,19 @@
 define([
 	'React',
 	'logger',
-	'components/NavigationComponent',
 	'components/TodoListComponent',
 	'components/TodoFormComponent',
 	'components/TodoStatsComponent'
-], function(React, logger, NavigationComponent, TodoListComponent, TodoFormComponent, TodoStatsComponent) {
+], function(
+	React,
+	logger,
+	TodoListComponent,
+	TodoFormComponent,
+	TodoStatsComponent
+) {
 	'use strict';
 	
-	var log = logger.get('RootComponent');
+	var log = logger.get('TodoComponent');
 
 	return React.createClass({
 		render: function () {
@@ -18,7 +23,7 @@ define([
 			return (
 				<div>
 					<h1>React Flux RequireJS Grunt - example todo list seed project</h1>
-					<NavigationComponent/>
+
 					<TodoListComponent/>
 					<TodoStatsComponent/>
 					<TodoFormComponent/>

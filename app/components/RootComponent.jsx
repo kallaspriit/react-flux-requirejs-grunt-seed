@@ -19,10 +19,10 @@ define([
 			log.info('render');
 		
 			return (
-				React.DOM.div(null, 
-					NavigationComponent(null), 
-					ViewComponent(null)
-				)
+				<div>
+					<NavigationComponent/>
+					<ViewComponent/>
+				</div>
 			);
 		}
 	});
