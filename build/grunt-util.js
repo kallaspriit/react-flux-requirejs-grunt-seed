@@ -100,6 +100,9 @@
 
             return name;
         },
+        convertConstantName: function(name) {
+            return name.replace(/\-/g, '_').toUpperCase();
+        },
 		copyTemplate: function(from, to, replace) {
 			var contents = this.readFile(from),
 				key,

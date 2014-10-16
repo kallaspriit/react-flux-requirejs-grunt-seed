@@ -255,6 +255,17 @@ module.exports = function (grunt) {
 						type: 'input'
 					}]
 				}
+			},
+			'generate-store': {
+				name: '',
+
+				options: {
+					questions: [{
+						message: 'Store name  ("forum-post" etc)',
+						config: 'prompt.generate-store.name',
+						type: 'input'
+					}]
+				}
 			}
 		}
 	});
@@ -311,6 +322,14 @@ module.exports = function (grunt) {
 			case 'component':
 				grunt.task.run('prompt:generate-component', '#handle-generate-component');
 			break;
+
+			case 'store':
+				grunt.task.run('prompt:generate-store', '#handle-generate-store');
+			break;
+
+			default:
+				throw new Error('Generating "' + what + '" is not implemented');
+			break;
 		}
 	});
 
@@ -340,9 +359,9 @@ module.exports = function (grunt) {
 			info
 		);
 
-		grunt.task.run('#generate-activities-js');
-
 		console.log('Created activity called "' + activityName + '" in "' + filename + '"');
+
+		grunt.task.run('#generate-activities-js');
 	});
 
 	grunt.registerTask('#handle-generate-component', '[private] Generates react component', function() {
@@ -372,6 +391,38 @@ module.exports = function (grunt) {
 		);
 
 		console.log('Created component called "' + componentName + '" in "' + filename + '"');
+	});
+
+	grunt.registerTask('#handle-generate-store', '[private] Generates a new store', function() {
+		var storeName = grunt.config('prompt.generate-store.name'),
+			info = {
+				name: storeName,
+				Name: util.convertEntityName(storeName),
+				naMe: util.convertCallableName(storeName),
+				NAME: util.convertConstantName(storeName),
+			},
+			filename = '../app/stores/' + info.Name + 'Store.js';
+
+		if (storeName.toLowerCase() !== storeName) {
+			throw new Error('Expected lower-case name like "forum-post" that is converted to "ForumPostStore"');
+		}
+
+		if (storeName.indexOf('store') !== -1) {
+			throw new Error(
+				'The name should not include "store", this is added automatically. ' +
+				'Expected name like "forum-post" that is converted to "ForumPostStore"'
+			);
+		}
+
+		util.copyTemplate(
+			'generator-templates/store.js.tpl',
+			filename,
+			info
+		);
+
+		console.log('Created store called "' + storeName + '" in "' + filename + '"');
+
+		grunt.task.run('#generate-stores-js');
 	});
 
 	grunt.registerTask('#generate-activities-js', '[private] Generates activities.js', function() {
