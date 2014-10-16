@@ -228,7 +228,7 @@ module.exports = function (grunt) {
 								{value: 'component', name: 'React component'},
 								{value: 'store', name: 'Store'},
 								{value: 'model', name: 'Model'},
-								{value: 'src', name: 'Application src file'}
+								{value: 'src', name: 'Application source file'}
 							];
 						}
 					}]
@@ -274,6 +274,17 @@ module.exports = function (grunt) {
 					questions: [{
 						message: 'Model name  ("forum-topic" etc)',
 						config: 'prompt.generate-model.name',
+						type: 'input'
+					}]
+				}
+			},
+			'generate-src': {
+				name: '',
+
+				options: {
+					questions: [{
+						message: 'Source resource name  ("resource-manager" etc)',
+						config: 'prompt.generate-src.name',
 						type: 'input'
 					}]
 				}
@@ -342,6 +353,10 @@ module.exports = function (grunt) {
 				grunt.task.run('prompt:generate-model', '#handle-generate-model');
 			break;
 
+			case 'src':
+				grunt.task.run('prompt:generate-src', '#handle-generate-src');
+			break;
+
 			default:
 				throw new Error('Generating "' + what + '" is not implemented');
 		}
@@ -389,8 +404,16 @@ module.exports = function (grunt) {
 			'../app/models',
 			'forum-topic'
 		);
+	});
 
-		grunt.task.run('#generate-stores-js');
+	grunt.registerTask('#handle-generate-src', '[private] Generates a new application source file', function() {
+		util.createTemplatedFile(
+			grunt.config('prompt.generate-src.name'),
+			'',
+			'generator-templates/src.js.tpl',
+			'../app/src',
+			'resource-manager'
+		);
 	});
 
 	grunt.registerTask('#generate-activities-js', '[private] Generates activities.js', function() {

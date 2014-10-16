@@ -137,7 +137,7 @@
 				);
 			}
 
-			if (name.indexOf(type) !== -1) {
+			if (type !== '' && name.indexOf(type) !== -1) {
 				throw new Error(
 					'The name should not include "' + type + '", this is added automatically. ' +
 					'Expected name like "' + example + '" that is converted to "' +
