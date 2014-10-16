@@ -2,7 +2,9 @@
 	'use strict';
 
 	var restify = require('restify'),
-		extend = require('xtend');
+		extend = require('xtend'),
+		Q = require('q'),
+		when = Q.when;
 
 	function Service() {
 		this._server = null;
@@ -12,26 +14,47 @@
 		};
 	}
 
+	Service.prototype.init = function(config) {
+		this._config = extend(this._config, config || {});
+
+		this._server = restify.createServer();
+		this._server.use(restify.bodyParser());
+
+		this._server.use(restify.CORS({
+			origins: ['*']
+		}));
+
+		this._server.on('uncaughtException', function (req, res, route, err) {
+			console.error(err.stack);
+			//process.exit(1);
+		});
+	};
+
 	Service.prototype.addApi = function(api) {
 		var argumentNames,
 			functionName,
 			handlerSignature;
 
 		for (functionName in api) {
-			if (typeof api[functionName] !== 'function' || functionName.substr(0, 1) === '_') {
+			if (typeof api[functionName] !== 'function' || functionName.substr(0, 1) === '_' || functionName === 'init') {
 				continue;
 			}
 
 			argumentNames = this._getFunctionArgumentNames(api[functionName]);
-			handlerSignature = this._getHandlerSignature(functionName);
 
-			this.addHandler(
-				handlerSignature.name,
-				handlerSignature.method,
-				argumentNames,
-				api[functionName],
-				api
-			);
+			try {
+				handlerSignature = this._getHandlerSignature(functionName);
+
+				this.addHandler(
+					handlerSignature.name,
+					handlerSignature.method,
+					argumentNames,
+					api[functionName],
+					api
+				);
+			} catch (e) {
+				console.log('failed to get signature from "' + functionName + '": ' + e.message);
+			}
 		}
 	};
 
@@ -46,33 +69,26 @@
 
 		this._server[method](route, function(req, res, next) {
 			var args = [],
-				response,
+				result,
 				paramName;
 
 			for (paramName in req.params) {
 				args.push(req.params[paramName]);
 			}
 
-			response = handler.apply(context || {}, args.concat([req, res]));
+			result = handler.apply(context || {}, args.concat([req, res]));
 
-			console.log('handle', req.path(), req.params, response);
+			console.log('handle', req.path(), req.params, result);
 
-			res.send(response);
+			when(result)
+				.then(function(response) {
+					res.send(response);
 
-			// TODO add support for deferred
-  			next();
-		});
-	};
-
-	Service.prototype.init = function(config) {
-		this._config = extend(this._config, config || {});
-
-		this._server = restify.createServer();
-		this._server.use(restify.bodyParser());
-
-		this._server.on('uncaughtException', function (req, res, route, err) {
-			console.error(err.stack);
-			//process.exit(1);
+					next();
+				})
+				.fail(function() {
+					throw new Error('request failed'); // TODO implement properly
+				});
 		});
 	};
 
