@@ -104,7 +104,7 @@ module.exports = function (grunt) {
 						//startFile: 'fragments/almond-start.frag',
 						endFile: 'fragments/almond-end.frag'
 					},
-					include: ['../dist/config/config', '../dist/stores', '../dist/routes', '../dist/activities'],
+					include: ['../dist/config/config', '../dist/stores', '../dist/config/routes', '../dist/activities'],
 					optimize: 'none',
 					//optimize: 'uglify2',
 					generateSourceMaps: true,
@@ -140,7 +140,7 @@ module.exports = function (grunt) {
 						pattern: '\'../dist/stores',
 						replacement: '\'stores'
 					}, {
-						pattern: '\'../dist/routes',
+						pattern: '\'../dist/config/routes',
 						replacement: '\'routes'
 					}, {
 						pattern: '\'../dist/activities',
@@ -278,7 +278,7 @@ module.exports = function (grunt) {
 		'requirejs:combined',
 		'string-replace:distScript',
 		'string-replace:distPaths',
-		//'clean:postDist'
+		'clean:postDist'
 	]);
 
 	// lints the sourcecode for errors
