@@ -239,8 +239,19 @@ module.exports = function (grunt) {
 
 				options: {
 					questions: [{
-						message: 'Activity name',
+						message: 'Activity name ("forum-post" etc)',
 						config: 'prompt.generate-activity.name',
+						type: 'input'
+					}]
+				}
+			},
+			'generate-component': {
+				name: '',
+
+				options: {
+					questions: [{
+						message: 'Component name  ("user-list" etc)',
+						config: 'prompt.generate-component.name',
 						type: 'input'
 					}]
 				}
@@ -287,7 +298,7 @@ module.exports = function (grunt) {
 	// following tasks are internal and should not be called directly
 
 	// generates a new model using a template
-	grunt.registerTask('#handle-generate', 'Private task, do not call directly', function() {
+	grunt.registerTask('#handle-generate', '[private] Triggers selected generator', function() {
 		var what = grunt.config('prompt.generate.what');
 
         console.log('Generating ' + what);
@@ -295,11 +306,15 @@ module.exports = function (grunt) {
 		switch (what) {
 			case 'activity':
 				grunt.task.run('prompt:generate-activity', '#handle-generate-activity');
+			break;
 
+			case 'component':
+				grunt.task.run('prompt:generate-component', '#handle-generate-component');
+			break;
 		}
 	});
 
-	grunt.registerTask('#handle-generate-activity', 'Private task, do not call directly', function() {
+	grunt.registerTask('#handle-generate-activity', '[private] Generates activity', function() {
 		var activityName = grunt.config('prompt.generate-activity.name'),
 			info = {
 				name: activityName,
@@ -327,38 +342,59 @@ module.exports = function (grunt) {
 
 		grunt.task.run('#generate-activities-js');
 
-		/*util.replaceInFile(
-			'../app/activities.js',
-			'\n\t\t// new activities are registered here, do not remove this line',
-			',\n\t\t' + info.naMe + ': ' + info.Name + 'Activity\n' +
-			'\t\t// new activities are registered here, do not remove this line',
-			true
-		);*/
-
 		console.log('Created activity called "' + activityName + '" in "' + filename + '"');
 	});
 
-	grunt.registerTask('#generate-activities-js', 'Private task, do not call directly', function() {
-		console.log('Generating activities.js');
+	grunt.registerTask('#handle-generate-component', '[private] Generates react component', function() {
+		var componentName = grunt.config('prompt.generate-component.name'),
+			info = {
+				name: componentName,
+				Name: util.convertEntityName(componentName),
+				naMe: util.convertCallableName(componentName),
+			},
+			filename = '../app/components/' + info.Name + 'Component.js';
 
-		var activityFiles = util.getFiles(
+		if (componentName.toLowerCase() !== componentName) {
+			throw new Error('Expected lower-case name like "user-list" that is converted to "UserListComponent"');
+		}
+
+		if (componentName.indexOf('component') !== -1) {
+			throw new Error(
+				'The name should not include "component", this is added automatically. ' +
+				'Expected name like "user-list" that is converted to "UserListActivity"'
+			);
+		}
+
+		util.copyTemplate(
+			'generator-templates/component.js.tpl',
+			filename,
+			info
+		);
+
+		console.log('Created component called "' + componentName + '" in "' + filename + '"');
+	});
+
+	grunt.registerTask('#generate-activities-js', '[private] Generates activities.js', function() {
+		var files = util.getFiles(
 				'*Activity.js', {
 					cwd: '../app/activities'
 				}
 			),
+			classNames = [],
 			includes = [],
 			classes = [],
 			mapping = [],
 			replace;
 
-		activityFiles.forEach(function(activityFile) {
-			var activityClassName = activityFile.replace(/\.[^/.]+$/, ''),
-				activityBaseName = activityClassName.substr(0, activityClassName.length - 8),
-				activityKeyName = activityBaseName.substr(0, 1).toLowerCase() + activityBaseName.substr(1);
+		files.forEach(function(activityFile) {
+			var className = activityFile.replace(/\.[^/.]+$/, ''),
+				baseName = className.substr(0, className.length - 8),
+				keyName = baseName.substr(0, 1).toLowerCase() + baseName.substr(1);
 
-			includes.push('activities/' + activityClassName);
-			classes.push(activityClassName);
-			mapping.push(activityKeyName + ': ' + activityClassName);
+			classNames.push(className);
+			includes.push('activities/' + className);
+			classes.push(className);
+			mapping.push(keyName + ': ' + className);
 		});
 
 		replace = {
@@ -372,5 +408,45 @@ module.exports = function (grunt) {
 			'../app/activities.js',
 			replace
 		);
+
+		console.log('Generated activities.js (' + classNames.join(', ') + ')');
+	});
+
+	grunt.registerTask('#generate-stores-js', '[private] Generates stores.js', function() {
+		var files = util.getFiles(
+				'*Store.js', {
+					cwd: '../app/stores'
+				}
+			),
+			classNames = [],
+			includes = [],
+			classes = [],
+			mapping = [],
+			replace;
+
+		files.forEach(function(activityFile) {
+			var className = activityFile.replace(/\.[^/.]+$/, ''),
+				baseName = className.substr(0, className.length - 5),
+				keyName = baseName.substr(0, 1).toLowerCase() + baseName.substr(1);
+
+			classNames.push(className);
+			includes.push('stores/' + className);
+			classes.push(className);
+			mapping.push(keyName + ': new ' + className + '()');
+		});
+
+		replace = {
+			includes: '\t\'' + includes.join('\',\n\t\'') + '\'',
+			classes: '\t' + classes.join(',\n\t'),
+			mapping: '\t\t' + mapping.join(',\n\t\t')
+		};
+
+		util.copyTemplate(
+			'generator-templates/stores.js.tpl',
+			'../app/stores.js',
+			replace
+		);
+
+		console.log('Generated stores.js (' + classNames.join(', ') + ')');
 	});
 };
