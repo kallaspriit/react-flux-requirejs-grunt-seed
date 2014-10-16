@@ -28,7 +28,8 @@ requirejs.config({
 		dispatcher: 'lib/reactor/Dispatcher',
 		util: 'src/Util',
 		config: 'config/config',
-		environment: 'config/environment'
+		environment: 'config/environment',
+		routes: 'config/routes'
 	},
 
 	// configuration of exports and dependencies

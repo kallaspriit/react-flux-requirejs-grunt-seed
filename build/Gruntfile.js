@@ -2,6 +2,8 @@
 module.exports = function (grunt) {
 	'use strict';
 
+	var util = require('./grunt-util.js');
+
 	// require all the dependencies
 	require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
@@ -208,6 +210,42 @@ module.exports = function (grunt) {
                 configFile: 'karma.conf.js'
             }
         },
+
+		// prompts the user for some information
+		// https://github.com/dylang/grunt-prompt
+		prompt: {
+			'generate': {
+				what: null,
+
+				options: {
+					questions: [{
+						message: 'What should we generate?',
+						config: 'prompt.generate.what',
+						type: 'list',
+						choices: function () {
+							return [
+								{value: 'activity', name: 'Activity'},
+								{value: 'component', name: 'React component'},
+								{value: 'store', name: 'Store'},
+								{value: 'model', name: 'Model'},
+								{value: 'src', name: 'Application src file'}
+							];
+						}
+					}]
+				}
+			},
+			'generate-activity': {
+				name: '',
+
+				options: {
+					questions: [{
+						message: 'Activity name',
+						config: 'prompt.generate-activity.name',
+						type: 'input'
+					}]
+				}
+			}
+		}
 	});
 
 	// register composite tasks
@@ -220,11 +258,119 @@ module.exports = function (grunt) {
 		'string-replace:distPaths',
 		//'clean:postDist'
 	]);
+
+	// lints the sourcecode for errors
 	grunt.registerTask('lint', ['jshint']);
+
+	// executes application tests
 	grunt.registerTask('test', ['react', 'karma']);
+
+	// generates documentation from code
 	grunt.registerTask('doc', ['jsdoc:dist']);
+
+	// starts a JSX compiler watch
 	grunt.registerTask('jsx', ['watch:jsx']);
+
+	// starts development version server
 	grunt.registerTask('server-dev', ['connect:dev']);
+
+	// builds the application and start production server
 	grunt.registerTask('server-production', ['build', 'connect:production']);
+
+	// default task, performs all main tasks
 	grunt.registerTask('default', ['lint', 'test', 'build', 'doc']);
+
+	// starts the generator
+    grunt.registerTask('generate', ['prompt:generate', '#handle-generate']);
+
+
+	// following tasks are internal and should not be called directly
+
+	// generates a new model using a template
+	grunt.registerTask('#handle-generate', 'Private task, do not call directly', function() {
+		var what = grunt.config('prompt.generate.what');
+
+        console.log('Generating ' + what);
+
+		switch (what) {
+			case 'activity':
+				grunt.task.run('prompt:generate-activity', '#handle-generate-activity');
+
+		}
+	});
+
+	grunt.registerTask('#handle-generate-activity', 'Private task, do not call directly', function() {
+		var activityName = grunt.config('prompt.generate-activity.name'),
+			info = {
+				name: activityName,
+				Name: util.convertEntityName(activityName),
+				naMe: util.convertCallableName(activityName),
+			},
+			filename = '../app/activities/' + info.Name + 'Activity.js';
+
+		if (activityName.toLowerCase() !== activityName) {
+			throw new Error('Expected lower-case name like "forum-topic" that is converted to "ForumTopicActivity"');
+		}
+
+		if (activityName.indexOf('activity') !== -1) {
+			throw new Error(
+				'The name should not include "activity", this is added automatically. ' +
+				'Expected name like "forum-topic" that is converted to "ForumTopicActivity"'
+			);
+		}
+
+		util.copyTemplate(
+			'generator-templates/activity.js.tpl',
+			filename,
+			info
+		);
+
+		grunt.task.run('#generate-activities-js');
+
+		/*util.replaceInFile(
+			'../app/activities.js',
+			'\n\t\t// new activities are registered here, do not remove this line',
+			',\n\t\t' + info.naMe + ': ' + info.Name + 'Activity\n' +
+			'\t\t// new activities are registered here, do not remove this line',
+			true
+		);*/
+
+		console.log('Created activity called "' + activityName + '" in "' + filename + '"');
+	});
+
+	grunt.registerTask('#generate-activities-js', 'Private task, do not call directly', function() {
+		console.log('Generating activities.js');
+
+		var activityFiles = util.getFiles(
+				'*Activity.js', {
+					cwd: '../app/activities'
+				}
+			),
+			includes = [],
+			classes = [],
+			mapping = [],
+			replace;
+
+		activityFiles.forEach(function(activityFile) {
+			var activityClassName = activityFile.replace(/\.[^/.]+$/, ''),
+				activityBaseName = activityClassName.substr(0, activityClassName.length - 8),
+				activityKeyName = activityBaseName.substr(0, 1).toLowerCase() + activityBaseName.substr(1);
+
+			includes.push('activities/' + activityClassName);
+			classes.push(activityClassName);
+			mapping.push(activityKeyName + ': ' + activityClassName);
+		});
+
+		replace = {
+			includes: '\t\'' + includes.join('\',\n\t\'') + '\'',
+			classes: '\t' + classes.join(',\n\t'),
+			mapping: '\t\t' + mapping.join(',\n\t\t')
+		};
+
+		util.copyTemplate(
+			'generator-templates/activities.js.tpl',
+			'../app/activities.js',
+			replace
+		);
+	});
 };
