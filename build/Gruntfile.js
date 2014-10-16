@@ -239,7 +239,7 @@ module.exports = function (grunt) {
 
 				options: {
 					questions: [{
-						message: 'Activity name ("forum-post" etc)',
+						message: 'Activity name ("forum-topic" etc)',
 						config: 'prompt.generate-activity.name',
 						type: 'input'
 					}]
@@ -250,7 +250,7 @@ module.exports = function (grunt) {
 
 				options: {
 					questions: [{
-						message: 'Component name  ("user-list" etc)',
+						message: 'Component name  ("forum-topic" etc)',
 						config: 'prompt.generate-component.name',
 						type: 'input'
 					}]
@@ -261,8 +261,19 @@ module.exports = function (grunt) {
 
 				options: {
 					questions: [{
-						message: 'Store name  ("forum-post" etc)',
+						message: 'Store name  ("forum-topic" etc)',
 						config: 'prompt.generate-store.name',
+						type: 'input'
+					}]
+				}
+			},
+			'generate-model': {
+				name: '',
+
+				options: {
+					questions: [{
+						message: 'Model name  ("forum-topic" etc)',
+						config: 'prompt.generate-model.name',
 						type: 'input'
 					}]
 				}
@@ -327,100 +338,57 @@ module.exports = function (grunt) {
 				grunt.task.run('prompt:generate-store', '#handle-generate-store');
 			break;
 
+			case 'model':
+				grunt.task.run('prompt:generate-model', '#handle-generate-model');
+			break;
+
 			default:
 				throw new Error('Generating "' + what + '" is not implemented');
-			break;
 		}
 	});
 
 	grunt.registerTask('#handle-generate-activity', '[private] Generates activity', function() {
-		var activityName = grunt.config('prompt.generate-activity.name'),
-			info = {
-				name: activityName,
-				Name: util.convertEntityName(activityName),
-				naMe: util.convertCallableName(activityName),
-			},
-			filename = '../app/activities/' + info.Name + 'Activity.js';
-
-		if (activityName.toLowerCase() !== activityName) {
-			throw new Error('Expected lower-case name like "forum-topic" that is converted to "ForumTopicActivity"');
-		}
-
-		if (activityName.indexOf('activity') !== -1) {
-			throw new Error(
-				'The name should not include "activity", this is added automatically. ' +
-				'Expected name like "forum-topic" that is converted to "ForumTopicActivity"'
-			);
-		}
-
-		util.copyTemplate(
+		util.createTemplatedFile(
+			grunt.config('prompt.generate-activity.name'),
+			'activity',
 			'generator-templates/activity.js.tpl',
-			filename,
-			info
+			'../app/activities',
+			'forum-topic'
 		);
-
-		console.log('Created activity called "' + activityName + '" in "' + filename + '"');
 
 		grunt.task.run('#generate-activities-js');
 	});
 
 	grunt.registerTask('#handle-generate-component', '[private] Generates react component', function() {
-		var componentName = grunt.config('prompt.generate-component.name'),
-			info = {
-				name: componentName,
-				Name: util.convertEntityName(componentName),
-				naMe: util.convertCallableName(componentName),
-			},
-			filename = '../app/components/' + info.Name + 'Component.js';
-
-		if (componentName.toLowerCase() !== componentName) {
-			throw new Error('Expected lower-case name like "user-list" that is converted to "UserListComponent"');
-		}
-
-		if (componentName.indexOf('component') !== -1) {
-			throw new Error(
-				'The name should not include "component", this is added automatically. ' +
-				'Expected name like "user-list" that is converted to "UserListActivity"'
-			);
-		}
-
-		util.copyTemplate(
+		util.createTemplatedFile(
+			grunt.config('prompt.generate-component.name'),
+			'component',
 			'generator-templates/component.js.tpl',
-			filename,
-			info
+			'../app/components',
+			'forum-topic'
 		);
-
-		console.log('Created component called "' + componentName + '" in "' + filename + '"');
 	});
 
 	grunt.registerTask('#handle-generate-store', '[private] Generates a new store', function() {
-		var storeName = grunt.config('prompt.generate-store.name'),
-			info = {
-				name: storeName,
-				Name: util.convertEntityName(storeName),
-				naMe: util.convertCallableName(storeName),
-				NAME: util.convertConstantName(storeName),
-			},
-			filename = '../app/stores/' + info.Name + 'Store.js';
-
-		if (storeName.toLowerCase() !== storeName) {
-			throw new Error('Expected lower-case name like "forum-post" that is converted to "ForumPostStore"');
-		}
-
-		if (storeName.indexOf('store') !== -1) {
-			throw new Error(
-				'The name should not include "store", this is added automatically. ' +
-				'Expected name like "forum-post" that is converted to "ForumPostStore"'
-			);
-		}
-
-		util.copyTemplate(
+		util.createTemplatedFile(
+			grunt.config('prompt.generate-store.name'),
+			'store',
 			'generator-templates/store.js.tpl',
-			filename,
-			info
+			'../app/stores',
+			'forum-topic'
 		);
 
-		console.log('Created store called "' + storeName + '" in "' + filename + '"');
+		grunt.task.run('#generate-stores-js');
+	});
+
+	grunt.registerTask('#handle-generate-model', '[private] Generates a new model', function() {
+		util.createTemplatedFile(
+			grunt.config('prompt.generate-model.name'),
+			'model',
+			'generator-templates/model.js.tpl',
+			'../app/models',
+			'forum-topic'
+		);
 
 		grunt.task.run('#generate-stores-js');
 	});

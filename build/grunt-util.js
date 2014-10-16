@@ -119,6 +119,39 @@
 			}
 
 			this.writeFile(to, contents);
+		},
+		createTemplatedFile: function(name, type, templateFilename, dir, example) {
+			var info = {
+					name: name,
+					Name: this.convertEntityName(name),
+					naMe: this.convertCallableName(name),
+					NAME: this.convertConstantName(name),
+				},
+				typeName = this.convertEntityName(type),
+				filename = dir + '/' + info.Name + typeName + '.js';
+
+			if (name.toLowerCase() !== name) {
+				throw new Error(
+					'Expected lower-case name like "' + example + '" that is converted to "' +
+					info.Name + typeName + '"'
+				);
+			}
+
+			if (name.indexOf(type) !== -1) {
+				throw new Error(
+					'The name should not include "' + type + '", this is added automatically. ' +
+					'Expected name like "' + example + '" that is converted to "' +
+					info.Name + typeName + '"'
+				);
+			}
+
+			this.copyTemplate(
+				templateFilename,
+				filename,
+				info
+			);
+
+			console.log('Created ' + type + ' called "' + name + '" in "' + filename + '"');
 		}
 	};
 
